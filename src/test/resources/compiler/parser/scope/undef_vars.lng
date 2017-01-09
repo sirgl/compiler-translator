@@ -1,0 +1,7 @@
+class MyClass {
+    void doX(int x){
+        a = 23;
+        b = 24;
+        c = true;
+    }
+}

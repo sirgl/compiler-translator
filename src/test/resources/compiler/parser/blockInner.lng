@@ -1,0 +1,18 @@
+class MyClass {
+    boolean b;
+    int c;
+
+    void doX(int x){
+        main.print();
+        int d = 0;
+        if(b){
+            main.println("good");
+            boolean b = false;
+            return;
+        } else {
+            boolean c = false;
+            main.println("bad");
+        }
+        main.print("onEnd!");
+    }
+}

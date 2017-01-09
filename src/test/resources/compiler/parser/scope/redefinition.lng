@@ -1,0 +1,6 @@
+class MyClass {
+    void doX(int a){
+        int a = 2;
+        int a = 4;
+    }
+}

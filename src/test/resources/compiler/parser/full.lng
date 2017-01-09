@@ -1,0 +1,15 @@
+class MyClass {
+    boolean b;
+    int c;
+
+    void doX(int x){
+        main.print();
+        if(b){
+            main.println("good");
+            return;
+        } else {
+            main.println("bad");
+        }
+        main.print("onEnd!");
+    }
+}
