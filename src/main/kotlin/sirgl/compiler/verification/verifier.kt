@@ -1,4 +1,4 @@
-package sirgl.compiler.parser.verification
+package sirgl.compiler.verification
 
 
 //class Verifier(val )

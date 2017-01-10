@@ -9,9 +9,7 @@ fun LangParser.AssignableTypeContext.toAst() : AssignableType {
         "boolean" -> BooleanType
         "char" -> CharType
         "long" -> LongType
-        else -> object : ObjectType {
-            override val className: String = text
-        }
+        else -> ObjectType(text)
     }
 }
 
@@ -23,8 +21,6 @@ fun LangParser.ReturnTypeContext.toAst() : ReturnType {
         "char" -> CharType
         "long" -> LongType
         "void" -> VoidType
-        else -> object : ObjectType {
-            override val className: String = text
-        }
+        else -> ObjectType(text)
     }
 }

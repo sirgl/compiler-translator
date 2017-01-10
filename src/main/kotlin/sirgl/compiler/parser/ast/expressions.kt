@@ -3,6 +3,8 @@ package sirgl.compiler.parser.ast
 
 interface Expression : Statement
 
+
+
 interface BinaryExpression : Expression {
     val left: Expression
     val right: Expression

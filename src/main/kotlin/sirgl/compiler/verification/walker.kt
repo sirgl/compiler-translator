@@ -1,4 +1,4 @@
-package sirgl.compiler.parser.verification
+package sirgl.compiler.verification
 
 import sirgl.compiler.parser.ast.*
 import sirgl.compiler.parser.getAllSuperclasses

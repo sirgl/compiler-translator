@@ -1,6 +1,7 @@
-package sirgl.compiler.parser.verification
+package sirgl.compiler.verification.scope
 
 import sirgl.compiler.parser.ast.*
+import sirgl.compiler.verification.VerificationException
 
 class Scope(val parentScope: Scope?) {
     val variableList = mutableListOf<ObjectReference>()

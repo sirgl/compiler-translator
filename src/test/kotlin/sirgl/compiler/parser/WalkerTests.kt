@@ -2,8 +2,10 @@ package sirgl.compiler.parser
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import sirgl.compiler.parser.ast.ClassDefinition
 import sirgl.compiler.parser.ast.MethodCallExpression
-import sirgl.compiler.parser.verification.TreeWalker
+import sirgl.compiler.parser.ast.Node
+import sirgl.compiler.verification.TreeWalker
 
 class WalkerTests  {
     @Test
@@ -21,5 +23,15 @@ class WalkerTests  {
         }, MethodCallExpression::class.java)
         treeWalker.walk(parseClassDef("compiler/parser/full.lng"))
         assertThat(methodNames).containsExactly("print", "println", "println", "print")
+    }
+
+    @Test
+    fun `every node has parent`(){
+        val ast = parseClassDef("compiler/parser/full.lng")
+        val treeWalker = TreeWalker()
+        treeWalker.addListener({
+            node -> node as Node
+            assertThat(node.parent != null || node is ClassDefinition).isTrue()
+        }, Node::class.java)
     }
 }

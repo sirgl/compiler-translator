@@ -1,6 +1,6 @@
 package sirgl.compiler.parser.ast
 
-import sirgl.compiler.parser.verification.Scope
+import sirgl.compiler.verification.scope.Scope
 
 interface Statement : Node
 
@@ -25,7 +25,7 @@ data class ReturnStatement(var expression: Expression?) : Statement {
     }
 }
 
-data class Block(var statements: List<Statement>) : Statement, Scoped {
+data class Block(var statements: List<Statement>) : Scoped, Node {
 
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null

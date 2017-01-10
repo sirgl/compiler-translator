@@ -5,6 +5,7 @@ import LangParser
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.BufferedTokenStream
 import sirgl.compiler.parser.ast.ClassDefinition
+import sirgl.compiler.parser.ast.CompilationUnit
 import sirgl.compiler.parser.transformer.toAst
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -26,3 +27,9 @@ fun parseClassDef(name: String): ClassDefinition {
     val parser = parserForStream(fromFile(name))
     return parser.classDefinition().toAst()
 }
+
+fun parseCompilationUnit(name: String): CompilationUnit{
+    val parser = parserForStream(fromFile(name))
+    return parser.compilationUnit().toAst()
+}
+

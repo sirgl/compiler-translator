@@ -3,7 +3,7 @@ package sirgl.compiler.parser
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import sirgl.compiler.parser.transformer.toAst
-import sirgl.compiler.parser.verification.extractMethodNames
+import sirgl.compiler.verification.scope.extractMethodNames
 
 class ResolutionTests {
     @Test

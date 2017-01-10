@@ -1,6 +1,6 @@
 package sirgl.compiler.parser.ast
 
-import sirgl.compiler.parser.verification.Scope
+import sirgl.compiler.verification.scope.Scope
 
 data class ClassDefinition(
         var methodList: List<MethodDefinition>,

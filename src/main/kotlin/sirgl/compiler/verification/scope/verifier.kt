@@ -1,6 +1,7 @@
-package sirgl.compiler.parser.verification
+package sirgl.compiler.verification.scope
 
 import sirgl.compiler.parser.ast.*
+import sirgl.compiler.verification.TreeWalker
 import java.util.*
 
 fun extractMethodNames(classDefinition: ClassDefinition): List<String> {
@@ -10,10 +11,18 @@ fun extractMethodNames(classDefinition: ClassDefinition): List<String> {
 
 interface VerificationError
 
-class ScopeVerifier(val classDefinition : ClassDefinition) {
+class ScopeVerifier(compilationUnit : CompilationUnit, defaultImports: List<String>) {
     val errors : MutableList<VerificationError> = mutableListOf()
+    val classDefinition : ClassDefinition = compilationUnit.classDefinition
     val methodNames = extractMethodNames(classDefinition)
-    val knownClasses = listOf(classDefinition.name)
+    val knownClasses = loadImports(compilationUnit, defaultImports)
+
+    private fun loadImports(compilationUnit: CompilationUnit, defaultImports: List<String>): List<String> {
+        val classes = compilationUnit.imports.map { it.name }.toMutableList()
+        classes.addAll(defaultImports)
+        classes.add(compilationUnit.fullName)
+        return classes
+    }
 
     fun checkScope(): MutableList<VerificationError> {
         initClassDefinitionScope()
@@ -60,7 +69,9 @@ class ScopeVerifier(val classDefinition : ClassDefinition) {
 
     private fun onReturnStatement(): (Any) -> Unit = {
         node -> node as ReturnStatement
-
+        val block = node.parent as Block
+//        block.
+        //TODO here must be return check
     }
 
     private fun walkVariables(block: Block) {

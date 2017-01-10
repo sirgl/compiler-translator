@@ -147,3 +147,11 @@ classDefinitionBlock :
     '{' (classDefinitionExpression)* '}';
 
 classDefinition : CLASS Identifier classDefinitionBlock;
+
+//compilation unit
+
+packageDeclaration: 'package' Identifier ';';
+
+importDeclaration: 'import' Identifier ';';
+
+compilationUnit: packageDeclaration? importDeclaration* classDefinition;

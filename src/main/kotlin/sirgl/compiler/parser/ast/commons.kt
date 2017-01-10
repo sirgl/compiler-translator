@@ -1,7 +1,7 @@
 package sirgl.compiler.parser.ast
 
 import sirgl.compiler.parser.getAllSuperclasses
-import sirgl.compiler.parser.verification.Scope
+import sirgl.compiler.verification.scope.Scope
 
 interface MetaInfo {
     val line: Int
@@ -76,9 +76,7 @@ object BooleanType : AssignableType
 object CharType : AssignableType
 object LongType : AssignableType
 
-interface ObjectType : AssignableType {
-    val className : String
-}
+data class ObjectType(val className: String) : AssignableType
 
 object VoidType : ReturnType
 
