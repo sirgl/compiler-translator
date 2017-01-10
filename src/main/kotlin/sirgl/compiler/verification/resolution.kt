@@ -1,16 +1,17 @@
 package sirgl.compiler.verification
 
-import sirgl.compiler.parser.ast.Type
-import sirgl.compiler.parser.ast.VoidType
+import sirgl.compiler.ClassRelatedError
 import sirgl.compiler.lang.NativeClass
 import sirgl.compiler.parser.ast.CompilationUnit
 import sirgl.compiler.parser.ast.ReturnType
+import sirgl.compiler.parser.ast.Type
+import sirgl.compiler.verification.scope.VerificationError
 import kotlin.reflect.KCallable
 
 interface ClassContext {
     val methodSignatures: List<MethodSignature>
     val className: String
-    val dependencies: List<Dependency>
+    val dependencies: List<String>
     val dependents: MutableList<ClassContext>
 }
 
@@ -20,16 +21,11 @@ data class MethodSignature(
         val returnType: ReturnType
 )
 
-data class Dependency(
-        val className: String,
-        var classContext: ClassContext?
-)
-
 class LangClassContext(
         override val methodSignatures: List<MethodSignature>,
         override val className: String,
-        val compilationUnit : CompilationUnit) : ClassContext {
-    override val dependencies: List<Dependency> = compilationUnit.imports.map { Dependency(it.name, null) }
+        val compilationUnit: CompilationUnit) : ClassContext {
+    override val dependencies: List<String> = compilationUnit.imports.map { it.name }
     override val dependents: MutableList<ClassContext> = mutableListOf()
 
 }
@@ -41,7 +37,7 @@ class NativeClassContext(
         val methodMap: Map<MethodSignature, KCallable<*>>
 ) : ClassContext {
 
-    override val dependencies: List<Dependency>
+    override val dependencies: List<String>
     override val dependents: MutableList<ClassContext>
 
     init {
@@ -52,4 +48,43 @@ class NativeClassContext(
 
 }
 
-class Resolver
+class StandardLibraryRepository {
+    var classes = mutableListOf<ClassContext>()
+    val classNames = classes.map { it.className }
+}
+
+class Resolver(classContexts: List<ClassContext>, standardLibraryRepository: StandardLibraryRepository) {
+    val resolvingSet = mutableSetOf<ClassContext>()
+    val errors = mutableListOf<VerificationError>()
+
+    init {
+        resolvingSet.addAll(classContexts)
+        resolvingSet.addAll(standardLibraryRepository.classes)
+    }
+
+    fun resolveClassNames(): MutableList<VerificationError> {
+        addMethodsToRegistery()
+        for (classContext in resolvingSet) {
+            classContext.dependencies
+                    .filterNot { dependency -> resolvingSet.any { it.className == dependency} }
+                    .mapTo(errors) { ClassRelatedError(classContext.className, UndefinedClassReference(it)) }
+        }
+        return errors
+
+//        return resolvingSet
+//                .flatMap { it.dependencies }
+//                .filterNot { dependency -> resolvingSet.any { it.className == dependency } }
+//                .mapTo(errors, ::UndefinedClassReference)
+    }
+
+    private fun addMethodsToRegistery() {
+        resolvingSet.forEach {
+            methodRegistery[it.className] = it.methodSignatures
+        }
+    }
+}
+
+data class UndefinedClassReference(val fullName: String) : VerificationError
+
+
+val methodRegistery = mutableMapOf<String, List<MethodSignature>>()
