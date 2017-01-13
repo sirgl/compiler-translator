@@ -2,9 +2,9 @@ package sirgl.compiler.parser
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import sirgl.compiler.parser.ast.IntegerType
-import sirgl.compiler.parser.ast.Parameter
-import sirgl.compiler.parser.ast.NamedReference
+import sirgl.compiler.ast.IntegerType
+import sirgl.compiler.ast.Parameter
+import sirgl.compiler.ast.NamedReference
 import sirgl.compiler.verification.scope.RedefinitionError
 import sirgl.compiler.verification.scope.ScopeVerifier
 import sirgl.compiler.verification.scope.UndefinedVariableUsageError

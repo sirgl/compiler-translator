@@ -31,7 +31,8 @@ class MainController {
     }
 
     fun resolveClasses(contexts: List<ClassContext>): List<VerificationError> {
-        val resolver = Resolver(contexts, stdLibRepo)
+        val classRegistery = ClassRegistery()
+        val resolver = Resolver(contexts, stdLibRepo, classRegistery)
         val resolveErrors = resolver.resolveClassNames()
         return resolveErrors
     }

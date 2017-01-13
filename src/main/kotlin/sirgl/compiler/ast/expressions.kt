@@ -1,7 +1,10 @@
-package sirgl.compiler.parser.ast
+package sirgl.compiler.ast
+
+import sirgl.compiler.verification.typing.SignatureDefined
+import sirgl.compiler.verification.typing.Typed
 
 
-interface Expression : Statement
+interface Expression : Statement, Typed
 
 
 
@@ -12,7 +15,9 @@ interface BinaryExpression : Expression {
 
 //Arithmetic expressions
 
-data class DivideExpression(override val left: Expression, override val right: Expression) : BinaryExpression {
+interface ArithmeticExpression : BinaryExpression
+
+data class DivideExpression(override val left: Expression, override val right: Expression) : ArithmeticExpression {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 
@@ -22,7 +27,7 @@ data class DivideExpression(override val left: Expression, override val right: E
     }
 }
 
-data class MultiplyExpression(override val left: Expression, override val right: Expression) : BinaryExpression {
+data class MultiplyExpression(override val left: Expression, override val right: Expression) : ArithmeticExpression {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 
@@ -32,7 +37,7 @@ data class MultiplyExpression(override val left: Expression, override val right:
     }
 }
 
-data class SumExpression(override val left: Expression, override val right: Expression) : BinaryExpression {
+data class SumExpression(override val left: Expression, override val right: Expression) : ArithmeticExpression {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 
@@ -42,7 +47,7 @@ data class SumExpression(override val left: Expression, override val right: Expr
     }
 }
 
-data class SubtractionExpression(override val left: Expression, override val right: Expression) : BinaryExpression {
+data class SubtractionExpression(override val left: Expression, override val right: Expression) : ArithmeticExpression {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 
@@ -52,7 +57,7 @@ data class SubtractionExpression(override val left: Expression, override val rig
     }
 }
 
-data class RemainderExpression(override val left: Expression, override val right: Expression) : BinaryExpression {
+data class RemainderExpression(override val left: Expression, override val right: Expression) : ArithmeticExpression {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 
@@ -119,7 +124,7 @@ data class EqualityExpression(override val left: Expression, override val right:
 
 //Special expressions
 
-data class AssignmentExpression(val namedReference: NamedReference, val expression: Expression) : Expression {
+data class AssignmentExpression(val variable: NamedReference, val expression: Expression) : Expression {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 
@@ -129,7 +134,7 @@ data class AssignmentExpression(val namedReference: NamedReference, val expressi
     }
 }
 
-data class ObjectCreationExpression(val constructorCall: ConstructorCall) : Expression {
+data class ObjectCreationExpression(val constructorCall: ConstructorCall) : Expression, SignatureDefined {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 
@@ -139,7 +144,7 @@ data class ObjectCreationExpression(val constructorCall: ConstructorCall) : Expr
     }
 }
 
-data class MethodCallExpression(val caller: Expression?, val methodCall: MethodCall) : Expression {
+data class MethodCallExpression(val caller: Expression?, val methodCall: MethodCall) : Expression, SignatureDefined {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 
@@ -195,10 +200,12 @@ open class NamedReference(override val name: String) : Expression, NamedEntity, 
     }
 
     fun isMethod() = parent is MethodCallExpression
-
+    override fun toString(): String {
+        return "NamedReference(name='$name', metaInfo=$metaInfo, parent=$parent, referenceType=$referenceType)"
+    }
 }
 
-data class Field(override val name: String) : ObjectReference, Node, NamedEntity {
+data class Field(override val name: String) : ObjectReference, Node, NamedEntity, Typed {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 

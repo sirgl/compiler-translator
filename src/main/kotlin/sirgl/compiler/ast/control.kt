@@ -1,4 +1,4 @@
-package sirgl.compiler.parser.ast
+package sirgl.compiler.ast
 
 interface ForControl : Node
 

@@ -1,6 +1,6 @@
 package sirgl.compiler.verification.scope
 
-import sirgl.compiler.parser.ast.*
+import sirgl.compiler.ast.*
 import sirgl.compiler.verification.TreeWalker
 import java.util.*
 
@@ -81,7 +81,7 @@ class ScopeVerifier(compilationUnit : CompilationUnit, defaultImports: List<Stri
         val varWalker = TreeWalker()
         varWalker.addListener({
             node -> node as AssignmentStatement
-            val error = scope.tryAdd(node.namedReference)
+            val error = scope.tryAdd(node.variable)
             handleRedefinitionErrors(conflictingReferences, error, node)
         }, AssignmentStatement::class.java)
         varWalker.addListener({
@@ -111,7 +111,7 @@ class ScopeVerifier(compilationUnit : CompilationUnit, defaultImports: List<Stri
 
     private fun handleRedefinitionErrors(conflictingReferences: MutableMap<String, MutableSet<PositionNodeWrapper>>, error: RedefinitionError?, node: AssignmentStatement) {
         if (error != null) {
-            val name = node.namedReference.name
+            val name = node.variable.name
             var conflicting = conflictingReferences[name]
             if (conflicting == null) {
                 conflicting = mutableSetOf()

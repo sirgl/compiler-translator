@@ -1,7 +1,10 @@
-package sirgl.compiler.parser.ast
+package sirgl.compiler.ast
 
 import sirgl.compiler.parser.getAllSuperclasses
+import sirgl.compiler.verification.MethodSignature
 import sirgl.compiler.verification.scope.Scope
+import sirgl.compiler.verification.typing.SignatureDefined
+import sirgl.compiler.verification.typing.Typed
 
 interface MetaInfo {
     val line: Int
@@ -10,7 +13,9 @@ interface MetaInfo {
 
 data class LineInfo(override val line: Int, override val position: Int) : MetaInfo
 
-data class MethodInfo(override val line: Int, override val position: Int) : MetaInfo
+data class TypedLineInfo(override val line: Int, override val position: Int, override var inferredType : Type? = null) : MetaInfo, Typed
+
+data class MethodInfo(override val line: Int, override val position: Int, override var signature: MethodSignature? = null, override var inferredType : Type? = null) : MetaInfo, SignatureDefined, Typed
 
 data class ReferenceInfo(override val line: Int, override val position: Int) : MetaInfo
 
@@ -33,18 +38,6 @@ interface Node {
     var metaInfo : MetaInfo?
     var parent : Node?
 
-//    fun <T : Node, R : Node> findUpperNode(targetClass: Class<T>, limitClass : Class<R>?) : Node? {
-//        val parent = parent ?: return null
-//        val parentClass = parent.javaClass
-//        if(parentClass == limitClass) {
-//            return null
-//        }
-//        if(parentClass == targetClass) {
-//            return parent
-//        }
-//        return parent.findUpper(targetClass, limitClass)
-//    }
-
     fun <T> findUpper(targetClass: Class<T>) : T? = findUpper<T, Nothing>(targetClass, null)
 
     fun <T, R : Node> findUpper(targetClass: Class<T>, limitClass : Class<R>?) : T? {
@@ -61,6 +54,12 @@ interface Node {
     }
 
     fun findClassDefinition()  = findUpper(ClassDefinition::class.java)
+
+    fun findUpperBlock(): Block? {
+        return findUpper(Block::class.java, ConstructorDefinition::class.java)
+    }
+
+    fun findUpperScoped() = findUpper(Scoped::class.java)
 }
 
 //Types
@@ -75,6 +74,10 @@ object ByteType : AssignableType
 object BooleanType : AssignableType
 object CharType : AssignableType
 object LongType : AssignableType
+object NullType : Type // surrogate type
+
+val stringType = ObjectType("lang.String")
+val objectType = ObjectType("lang.String")
 
 data class ObjectType(val className: String) : AssignableType
 
@@ -90,6 +93,34 @@ interface FunctionCall : Node {
     val arguments: List<Expression>
 }
 
-interface ObjectReference {
+interface ObjectReference : Typed {
     val name : String
 }
+
+fun Type.isCastableTo(another : Type) : Boolean {
+    return when (this) {
+        is NullType -> true
+        is VoidType -> false
+        is BooleanType -> false
+        is ByteType -> when (another) {
+            is ByteType, is IntegerType, is LongType -> true
+            else -> false
+        }
+        is CharType -> when (another) {
+            is CharType, is IntegerType, is LongType -> true
+            else -> false
+        }
+        is IntegerType -> when(another) {
+            is IntegerType, is LongType -> true
+            else -> false
+        }
+        is LongType -> when(another) {
+            is LongType -> true
+            else -> false
+        }
+        is ObjectType -> another is ObjectType && (another.className == className) // Sometimes here will be inheritance
+        else -> false // todo
+    }
+}
+
+fun Type.isArithmetic()  = this is ByteType || this is IntegerType || this is LongType || this is CharType

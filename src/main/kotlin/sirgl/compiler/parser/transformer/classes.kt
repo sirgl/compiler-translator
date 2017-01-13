@@ -1,6 +1,6 @@
 package sirgl.compiler.parser.transformer
 
-import sirgl.compiler.parser.ast.*
+import sirgl.compiler.ast.*
 
 class ParserException(message: String?) : RuntimeException(message)
 

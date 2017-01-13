@@ -1,6 +1,6 @@
 package sirgl.compiler.parser.transformer
 
-import sirgl.compiler.parser.ast.Expression
+import sirgl.compiler.ast.Expression
 
 
 fun extractPossibleEmptyExpr(expr : LangParser.ExpressionContext): Expression? {

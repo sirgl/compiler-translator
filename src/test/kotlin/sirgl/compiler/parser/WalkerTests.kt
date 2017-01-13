@@ -2,9 +2,9 @@ package sirgl.compiler.parser
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import sirgl.compiler.parser.ast.ClassDefinition
-import sirgl.compiler.parser.ast.MethodCallExpression
-import sirgl.compiler.parser.ast.Node
+import sirgl.compiler.ast.ClassDefinition
+import sirgl.compiler.ast.MethodCallExpression
+import sirgl.compiler.ast.Node
 import sirgl.compiler.verification.TreeWalker
 
 class WalkerTests  {

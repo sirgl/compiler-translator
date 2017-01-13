@@ -1,6 +1,6 @@
 package sirgl.compiler.parser.transformer
 
-import sirgl.compiler.parser.ast.*
+import sirgl.compiler.ast.*
 
 fun LangParser.IfStatementContext.toAst(): IfStatement {
     val condition = expression().toAst()

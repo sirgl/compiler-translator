@@ -1,4 +1,4 @@
-package sirgl.compiler.parser.ast
+package sirgl.compiler.ast
 
 data class CompilationUnit(val imports: List<ImportDeclaration>, val classDefinition: ClassDefinition, val packageDeclaration: PackageDeclaration?) : Node {
     override var metaInfo: MetaInfo? = null

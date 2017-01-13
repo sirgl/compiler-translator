@@ -1,11 +1,12 @@
-package sirgl.compiler.parser.ast
+package sirgl.compiler.ast
 
 import sirgl.compiler.verification.scope.Scope
+import sirgl.compiler.verification.typing.Typed
 
 interface Statement : Node
 
 
-data class AssignmentStatement(var namedReference: NamedReference, var variableType: AssignableType, var expression: Expression) : Statement {
+data class AssignmentStatement(var variable: NamedReference, var variableType: AssignableType, var expression: Expression) : Statement {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 
@@ -15,7 +16,7 @@ data class AssignmentStatement(var namedReference: NamedReference, var variableT
     }
 }
 
-data class ReturnStatement(var expression: Expression?) : Statement {
+data class ReturnStatement(var expression: Expression?) : Statement, Typed {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
 
@@ -36,11 +37,7 @@ data class Block(var statements: List<Statement>) : Scoped, Node {
         this.parent = parent
     }
 
-    fun findUpperBlock(): Block? {
-        return findUpper(Block::class.java, ConstructorDefinition::class.java)
-    }
 
-    fun findUpperScoped() = findUpper(Scoped::class.java)
 
 
     override var scope: Scope?

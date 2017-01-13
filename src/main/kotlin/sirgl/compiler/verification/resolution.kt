@@ -2,9 +2,9 @@ package sirgl.compiler.verification
 
 import sirgl.compiler.ClassRelatedError
 import sirgl.compiler.lang.NativeClass
-import sirgl.compiler.parser.ast.CompilationUnit
-import sirgl.compiler.parser.ast.ReturnType
-import sirgl.compiler.parser.ast.Type
+import sirgl.compiler.ast.CompilationUnit
+import sirgl.compiler.ast.ReturnType
+import sirgl.compiler.ast.Type
 import sirgl.compiler.verification.scope.VerificationError
 import kotlin.reflect.KCallable
 
@@ -53,7 +53,7 @@ class StandardLibraryRepository {
     val classNames = classes.map { it.className }
 }
 
-class Resolver(classContexts: List<ClassContext>, standardLibraryRepository: StandardLibraryRepository) {
+class Resolver(classContexts: List<ClassContext>, standardLibraryRepository: StandardLibraryRepository, val classRegistery : ClassRegistery) {
     val resolvingSet = mutableSetOf<ClassContext>()
     val errors = mutableListOf<VerificationError>()
 
@@ -66,20 +66,22 @@ class Resolver(classContexts: List<ClassContext>, standardLibraryRepository: Sta
         addMethodsToRegistery()
         for (classContext in resolvingSet) {
             classContext.dependencies
-                    .filterNot { dependency -> resolvingSet.any { it.className == dependency} }
+                    .filterNot { dependency -> resolvingSet.any { it.className == dependency } }
                     .mapTo(errors) { ClassRelatedError(classContext.className, UndefinedClassReference(it)) }
         }
         return errors
-
-//        return resolvingSet
-//                .flatMap { it.dependencies }
-//                .filterNot { dependency -> resolvingSet.any { it.className == dependency } }
-//                .mapTo(errors, ::UndefinedClassReference)
     }
+
 
     private fun addMethodsToRegistery() {
         resolvingSet.forEach {
-            methodRegistery[it.className] = it.methodSignatures
+            classRegistery.methods[it.className] = it.methodSignatures
+        }
+    }
+
+    private fun addConstructorsToRegistery() {
+        resolvingSet.forEach {
+
         }
     }
 }
@@ -87,4 +89,10 @@ class Resolver(classContexts: List<ClassContext>, standardLibraryRepository: Sta
 data class UndefinedClassReference(val fullName: String) : VerificationError
 
 
-val methodRegistery = mutableMapOf<String, List<MethodSignature>>()
+class ClassRegistery(
+        val methods: MutableMap<String, List<MethodSignature>> = mutableMapOf(),
+        val constructors: MutableMap<String, List<MethodSignature>> = mutableMapOf()
+        ) {
+
+}
+

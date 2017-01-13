@@ -2,7 +2,7 @@ package sirgl.compiler.parser.transformer
 
 import LangParser
 import org.antlr.v4.runtime.tree.TerminalNode
-import sirgl.compiler.parser.ast.*
+import sirgl.compiler.ast.*
 
 fun LangParser.BlockContext.toAst(): Block {
 
@@ -37,7 +37,7 @@ fun LangParser.AssignmentStatementContext.toAst(): AssignmentStatement {
 }
 
 fun LangParser.ReturnStatementContext.toAst(): ReturnStatement {
-    val lineInfo = LineInfo(start.line, start.charPositionInLine)
+    val lineInfo = TypedLineInfo(start.line, start.charPositionInLine)
     return if(expression().text.isEmpty()) {
         ReturnStatement(null, lineInfo)
     } else {

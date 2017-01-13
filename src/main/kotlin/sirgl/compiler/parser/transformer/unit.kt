@@ -1,9 +1,9 @@
 package sirgl.compiler.parser.transformer
 
-import sirgl.compiler.parser.ast.CompilationUnit
-import sirgl.compiler.parser.ast.ImportDeclaration
-import sirgl.compiler.parser.ast.LineInfo
-import sirgl.compiler.parser.ast.PackageDeclaration
+import sirgl.compiler.ast.CompilationUnit
+import sirgl.compiler.ast.ImportDeclaration
+import sirgl.compiler.ast.LineInfo
+import sirgl.compiler.ast.PackageDeclaration
 
 fun LangParser.ImportDeclarationContext.toAst(): ImportDeclaration {
     return ImportDeclaration(Identifier().text, LineInfo(Identifier().symbol.line, Identifier().symbol.charPositionInLine))

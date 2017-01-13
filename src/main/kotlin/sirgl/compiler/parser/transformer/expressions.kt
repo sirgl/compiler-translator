@@ -1,7 +1,7 @@
 package sirgl.compiler.parser.transformer
 
 import LangParser
-import sirgl.compiler.parser.ast.*
+import sirgl.compiler.ast.*
 
 
 fun LangParser.ExpressionContext.toAst(): Expression = when (this) {
@@ -20,7 +20,7 @@ fun LangParser.ExpressionContext.toAst(): Expression = when (this) {
 
 fun LangParser.MethodCallWithoutSourceContext.toAst(): MethodCallExpression {
     val methodCall = functionCall().toMethodAst()
-    val methodCallExpression = MethodCallExpression(null, methodCall, LineInfo(start.line, start.charPositionInLine))
+    val methodCallExpression = MethodCallExpression(null, methodCall, TypedLineInfo(start.line, start.charPositionInLine))
     methodCall.parent = methodCallExpression
     return methodCallExpression
 }
@@ -28,7 +28,7 @@ fun LangParser.MethodCallWithoutSourceContext.toAst(): MethodCallExpression {
 fun LangParser.AssignmentExprContext.toAst(): AssignmentExpression {
     val variable = NamedReference(Identifier().text, ReferenceInfo(start.line, start.charPositionInLine))
     val expression = expression().toAst()
-    val assignmentExpression = AssignmentExpression(variable, expression, LineInfo(start.line, start.charPositionInLine))
+    val assignmentExpression = AssignmentExpression(variable, expression, TypedLineInfo(start.line, start.charPositionInLine))
     variable.parent = assignmentExpression
     expression.parent = assignmentExpression
     return assignmentExpression
@@ -36,7 +36,7 @@ fun LangParser.AssignmentExprContext.toAst(): AssignmentExpression {
 
 fun LangParser.ConstructorCallContext.toAst(): ObjectCreationExpression {
     val constructorCall = functionCall().toConstructorAst()
-    val objectCreationExpression = ObjectCreationExpression(constructorCall, LineInfo(start.line, start.charPositionInLine))
+    val objectCreationExpression = ObjectCreationExpression(constructorCall, TypedLineInfo(start.line, start.charPositionInLine))
     constructorCall.parent = objectCreationExpression
     return objectCreationExpression
 }
@@ -44,7 +44,7 @@ fun LangParser.ConstructorCallContext.toAst(): ObjectCreationExpression {
 fun LangParser.EqallityExprContext.toAst(): EqualityExpression {
     val left = expression(0).toAst()
     val right = expression(1).toAst()
-    val equalityExpression = EqualityExpression(left, right, LineInfo(start.line, start.charPositionInLine))
+    val equalityExpression = EqualityExpression(left, right, TypedLineInfo(start.line, start.charPositionInLine))
     left.parent = equalityExpression
     right.parent = equalityExpression
     return equalityExpression
@@ -54,8 +54,9 @@ fun LangParser.MultiplyExprContext.toAst(): BinaryExpression {
     val left = expression(0).toAst()
     val right = expression(1).toAst()
     val binaryExpression = when (operator.text) {
-        "*" -> MultiplyExpression(left, right, LineInfo(start.line, start.charPositionInLine))
-        "/" -> DivideExpression(left, right, LineInfo(start.line, start.charPositionInLine))
+        "*" -> MultiplyExpression(left, right, TypedLineInfo(start.line, start.charPositionInLine))
+        "/" -> DivideExpression(left, right, TypedLineInfo(start.line, start.charPositionInLine))
+        "%" -> RemainderExpression(left, right, TypedLineInfo(start.line, start.charPositionInLine))
         else -> throw ParserException("Unexpected multiply operator")
     }
     left.parent = binaryExpression
@@ -67,8 +68,8 @@ fun LangParser.SumExprContext.toAst(): BinaryExpression {
     val left = expression(0).toAst()
     val right = expression(1).toAst()
     val binaryExpression = when (operator.text) {
-        "+" -> SumExpression(left, right, LineInfo(start.line, start.charPositionInLine))
-        "-" -> SubtractionExpression(left, right, LineInfo(start.line, start.charPositionInLine))
+        "+" -> SumExpression(left, right, TypedLineInfo(start.line, start.charPositionInLine))
+        "-" -> SubtractionExpression(left, right, TypedLineInfo(start.line, start.charPositionInLine))
         else -> throw ParserException("Unexpected sum operator")
     }
     left.parent = binaryExpression
@@ -80,10 +81,10 @@ fun LangParser.ComparsionExprContext.toAst(): BinaryPredicateExpression {
     val left = expression(0).toAst()
     val right = expression(1).toAst()
     val binaryPredicateExpression = when (operator.text) {
-        ">" -> GreaterThanExpression(left, right, LineInfo(start.line, start.charPositionInLine))
-        "<" -> LessThanExpression(left, right, LineInfo(start.line, start.charPositionInLine))
-        "<=" -> LessThanOrEqualsExpression(left, right, LineInfo(start.line, start.charPositionInLine))
-        ">=" -> GreaterThanOrEqualsExpression(left, right, LineInfo(start.line, start.charPositionInLine))
+        ">" -> GreaterThanExpression(left, right, TypedLineInfo(start.line, start.charPositionInLine))
+        "<" -> LessThanExpression(left, right, TypedLineInfo(start.line, start.charPositionInLine))
+        "<=" -> LessThanOrEqualsExpression(left, right, TypedLineInfo(start.line, start.charPositionInLine))
+        ">=" -> GreaterThanOrEqualsExpression(left, right, TypedLineInfo(start.line, start.charPositionInLine))
         else -> throw ParserException("Unexpected sum operator")
     }
     left.parent = binaryPredicateExpression
@@ -110,14 +111,14 @@ fun LangParser.MethodCallContext.toAst(): MethodCallExpression {
 
 fun LangParser.FunctionCallContext.toMethodAst(): MethodCall {
     val arguments = expressionList().toAst()
-    val methodCall = MethodCall(Identifier().text, arguments, LineInfo(start.line, start.charPositionInLine))
+    val methodCall = MethodCall(Identifier().text, arguments, MethodInfo(start.line, start.charPositionInLine))
     arguments.forEach { it.parent = methodCall }
     return methodCall
 }
 
 fun LangParser.FunctionCallContext.toConstructorAst(): ConstructorCall {
     val arguments = expressionList().toAst()
-    val constructorCall = ConstructorCall(Identifier().text, arguments, LineInfo(start.line, start.charPositionInLine))
+    val constructorCall = ConstructorCall(Identifier().text, arguments, MethodInfo(start.line, start.charPositionInLine))
     arguments.forEach { it.parent = constructorCall }
     return constructorCall
 }
@@ -135,28 +136,28 @@ fun LangParser.PrimaryContext.toAst(): Expression {
         return expression().toAst()
     }
     if (StringLiteral() != null) {
-        return StringLiteral(StringLiteral().text.substring(1, StringLiteral().text.lastIndex), LineInfo(start.line, start.charPositionInLine))
+        return StringLiteral(StringLiteral().text.substring(1, StringLiteral().text.lastIndex), TypedLineInfo(start.line, start.charPositionInLine, stringType))
     }
     if (IntLiteral() != null) {
-        return IntLiteral(IntLiteral().text.toInt(), LineInfo(start.line, start.charPositionInLine))
+        return IntLiteral(IntLiteral().text.toInt(), TypedLineInfo(start.line, start.charPositionInLine, IntegerType))
     }
     if (Identifier() != null) {
-        return NamedReference(Identifier().text, ReferenceType.Variable, LineInfo(start.line, start.charPositionInLine))
+        return NamedReference(Identifier().text, ReferenceType.Variable, TypedLineInfo(start.line, start.charPositionInLine))
     }
     if (THIS() != null) {
-        return ThisExpression(LineInfo(start.line, start.charPositionInLine))
+        return ThisExpression(TypedLineInfo(start.line, start.charPositionInLine))
     }
     if (NULL() != null) {
-        return NullLiteral(LineInfo(start.line, start.charPositionInLine))
+        return NullLiteral(TypedLineInfo(start.line, start.charPositionInLine, NullType)) // TODO
     }
     if (CharLiteral() != null) {
-        return CharLiteral(CharLiteral().text[0], LineInfo(start.line, start.charPositionInLine))
+        return CharLiteral(CharLiteral().text[0], TypedLineInfo(start.line, start.charPositionInLine, CharType))
     }
     if (TRUE() != null) {
-        return TrueLiteral(LineInfo(start.line, start.charPositionInLine))
+        return TrueLiteral(TypedLineInfo(start.line, start.charPositionInLine, BooleanType))
     }
     if (FALSE() != null) {
-        return FalseLiteral(LineInfo(start.line, start.charPositionInLine))
+        return FalseLiteral(TypedLineInfo(start.line, start.charPositionInLine, BooleanType))
     }
     throw UnsupportedOperationException()
 }

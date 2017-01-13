@@ -2,7 +2,7 @@ package sirgl.compiler.parser
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import sirgl.compiler.parser.ast.*
+import sirgl.compiler.ast.*
 import sirgl.compiler.parser.transformer.toAst
 
 class ParserTests {

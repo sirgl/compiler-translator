@@ -4,8 +4,8 @@ import LangLexer
 import LangParser
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.BufferedTokenStream
-import sirgl.compiler.parser.ast.ClassDefinition
-import sirgl.compiler.parser.ast.CompilationUnit
+import sirgl.compiler.ast.ClassDefinition
+import sirgl.compiler.ast.CompilationUnit
 import sirgl.compiler.parser.transformer.toAst
 import java.io.ByteArrayInputStream
 import java.io.InputStream

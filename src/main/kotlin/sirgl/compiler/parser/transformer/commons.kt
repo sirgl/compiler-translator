@@ -1,6 +1,6 @@
 package sirgl.compiler.parser.transformer
 
-import sirgl.compiler.parser.ast.*
+import sirgl.compiler.ast.*
 
 fun LangParser.AssignableTypeContext.toAst() : AssignableType {
     return when (text) {

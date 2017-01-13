@@ -1,6 +1,6 @@
 package sirgl.compiler.verification
 
-import sirgl.compiler.parser.ast.*
+import sirgl.compiler.ast.*
 import sirgl.compiler.parser.getAllSuperclasses
 import sirgl.compiler.parser.transformer.ParserException
 
@@ -153,7 +153,7 @@ class TreeWalker {
             return
         }
         notifyListeners(expression)
-        walk(expression.namedReference)
+        walk(expression.variable)
         walk(expression.expression)
     }
 

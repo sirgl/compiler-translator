@@ -1,6 +1,8 @@
-package sirgl.compiler.parser.ast
+package sirgl.compiler.ast
 
+import sirgl.compiler.verification.MethodSignature
 import sirgl.compiler.verification.scope.Scope
+import sirgl.compiler.verification.typing.Typed
 
 data class ClassDefinition(
         var methodList: List<MethodDefinition>,
@@ -18,7 +20,7 @@ data class ClassDefinition(
     }
 }
 
-data class Parameter(var assignableType : AssignableType, override var name : String) : Node, ObjectReference {
+data class Parameter(var assignableType : AssignableType, override var name : String) : Node, ObjectReference, Typed {
     override var metaInfo: MetaInfo? = null
     override var parent: Node? = null
     constructor(assignableType : AssignableType, name : String, metaInfo : MetaInfo) : this(assignableType, name) {
@@ -70,6 +72,10 @@ data class ConstructorDeclaration(var className : String, var parameters : List<
         this.metaInfo = metaInfo
         this.parent = parent
     }
+
+//    fun toSignature() : Boolean {
+//
+//    }
 
 }
 
